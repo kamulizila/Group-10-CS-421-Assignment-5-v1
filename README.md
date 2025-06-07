@@ -29,5 +29,8 @@ Backend:
 ```
 http://ec2-13-218-207-74.compute-1.amazonaws.com:8000/api/targets/
 ```
-
+Frontend:
+```
+http://ec2-13-218-207-74.compute-1.amazonaws.com:8080/targets 
+```
 
