@@ -22,3 +22,12 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+
+### API  URLS
+Backend:
+```
+http://ec2-13-218-207-74.compute-1.amazonaws.com:8000/api/targets/
+```
+
+
