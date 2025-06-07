@@ -3,17 +3,28 @@ services:
     image: postgres:13
     environment:
       POSTGRES_DB: group_db
-      POSTGRES_USER: netumo
-      POSTGRES_PASSWORD: netumo
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     build: .
     command: gunicorn mini_netumo.wsgi:application --bind 0.0.0.0:8000
+    working_dir: /app
     volumes:
       - ./backend:/app
     ports:
@@ -26,6 +37,7 @@ services:
   worker:
     build: .
     command: celery -A mini_netumo worker -l info
+    working_dir: /app
     volumes:
       - ./backend:/app
     env_file: .env
@@ -36,6 +48,7 @@ services:
   beat:
     build: .
     command: celery -A mini_netumo beat -l info
+    working_dir: /app
     volumes:
       - ./backend:/app
     env_file: .env
@@ -47,6 +60,11 @@ services:
     build: .
     ports:
       - "3001:80"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   nginx:
     image: nginx:alpine
@@ -57,5 +75,18 @@ services:
     depends_on:
       - vue-frontend
 
+  backup:
+    build: ./backup/cron
+    volumes:
+      - pg_backup:/backups
+    environment:
+      POSTGRES_DB: group_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_HOST: db
+    depends_on:
+      - db
+
 volumes:
   pgdata:
+  pg_backup:

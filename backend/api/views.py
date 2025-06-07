@@ -123,3 +123,4 @@ def status_last_24h(request, target_id):
     since = now() - timedelta(hours=24)
     logs = StatusLog.objects.filter(target_id=target_id, timestamp__gte=since).order_by('timestamp')
     return Response(StatusLogSerializer(logs, many=True).data)
+

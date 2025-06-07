@@ -1,5 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from django.http import JsonResponse
 from .views import (
     TargetViewSet, StatusViewSet, HistoryViewSet,
     AlertViewSet, SSLCheckViewSet, DomainCheckViewSet,
@@ -15,9 +16,12 @@ router.register(r'alerts', AlertViewSet)
 router.register(r'ssl-checks', SSLCheckViewSet)
 router.register(r'domain-checks', DomainCheckViewSet)
 
+def healthcheck(request):
+    return JsonResponse({'status': 'ok'})
 # Define all urlpatterns under the /api/ prefix
 urlpatterns = [
     path('api/status/latest/', LatestStatusViewSet.as_view({'get': 'list'}), name='status-latest'),
     path('api/status_24h/<int:target_id>/', status_last_24h),  # ✅ This now lives under /api/
     path('api/', include(router.urls)),
+    path('healthcheck/', healthcheck),
 ]
