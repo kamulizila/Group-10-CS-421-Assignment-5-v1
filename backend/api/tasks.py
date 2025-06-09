@@ -1,5 +1,5 @@
 from celery import shared_task 
-from datetime import datetime, timezone, date  # ✅ Added date
+from datetime import datetime, timezone, date  
 from django.utils.timezone import now
 from django.core.mail import send_mail
 import requests
@@ -32,6 +32,7 @@ def send_alert_email(message, target):
         subject=f'[ALERT] Issue with {target.url}',
         message=message,
         from_email='umakomaward@gmail.com',
+        recipient_list=['frankkiruma05@gmail.com'],
         recipient_list=['kamulizila97@gmail.com'],
     )
 
@@ -120,7 +121,7 @@ def check_ssl_and_domain_expiry():
             w = whois.whois(domain)
             domain_expiry = w.expiration_date
 
-            # ✅ Handle various expiration_date types
+            # Handle various expiration_date types
             if isinstance(domain_expiry, list):
                 domain_expiry = domain_expiry[0]
 
