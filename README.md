@@ -29,6 +29,12 @@ Backend:
 ```
 http://ec2-13-218-207-74.compute-1.amazonaws.com:8000/api/
 ```
+### Admin Dashboard
+http://ec2-13-218-207-74.compute-1.amazonaws.com:8000/admin/
+```
+username: Group10
+
+password: Group10
 Frontend:
 ```
 http://ec2-13-218-207-74.compute-1.amazonaws.com:8080/targets 
