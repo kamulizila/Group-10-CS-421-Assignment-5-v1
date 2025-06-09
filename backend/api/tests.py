@@ -1,7 +1,9 @@
 from django.test import TestCase
 from django.urls import reverse
 from datetime import datetime, timedelta
-from api.models import Target, DomainCheck  # Adjust import if models are elsewhere
+
+# Adjust import if models are elsewhere
+from api.models import Target, DomainCheck  
 
 class DomainCheckTestCase(TestCase):
     def setUp(self):
@@ -24,5 +26,5 @@ class DomainCheckTestCase(TestCase):
         data = response.json()
         self.assertTrue(len(data) > 0)
         self.assertIn('target_url', data[0])
-        self.assertEqual(data[0]['target_url']['url'], self.target.url)  # ✅ correct
+        self.assertEqual(data[0]['target_url']['url'], self.target.url)  
 
