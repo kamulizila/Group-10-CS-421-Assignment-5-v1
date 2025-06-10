@@ -104,7 +104,8 @@ else:
 # CELERY_TASK_SERIALIZER = 'json'
 
 # Celery config
-CELERY_BROKER_URL = 'redis://redis:6379/0'  # Or RabbitMQ
+CELERY_BROKER_URL = 'redis://localhost:6379/0' #Running locally
+# CELERY_BROKER_URL = 'redis://redis:6379/0'  # Running in docker
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'  # Or your timezone

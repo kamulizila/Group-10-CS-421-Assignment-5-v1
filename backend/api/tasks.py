@@ -32,8 +32,8 @@ def send_alert_email(message, target):
         subject=f'[ALERT] Issue with {target.url}',
         message=message,
         from_email='umakomaward@gmail.com',
-        recipient_list=['frankkiruma05@gmail.com'],
-        recipient_list=['kamulizila97@gmail.com'],
+        # recipient_list=['frankkiruma05@gmail.com'],
+        recipient_list=['kamulizila97@gmail.com', 'frankkiruma05@gmail.com'],
     )
 
 @shared_task
