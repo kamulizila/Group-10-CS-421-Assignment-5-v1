@@ -1,17 +1,20 @@
 services:
   db:
-    image: postgres:13
+    image: postgres:14
     environment:
       POSTGRES_DB: group_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
+      # Removed POSTGRES_HOST as it's not a valid PostgreSQL env variable
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d group_db"]
       interval: 10s
       timeout: 5s
       retries: 5
+    ports:
+      - "5432:5432"  # Added port mapping for external access if needed
 
   redis:
     image: redis:alpine
@@ -20,26 +23,37 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    ports:
+      - "6379:6379"  # Added port mapping
 
   backend:
     build: .
     command: gunicorn mini_netumo.wsgi:application --bind 0.0.0.0:8000
     working_dir: /app
     volumes:
-      - ./backend:/app
+      - ./:/app  # Changed to mount entire directory
+      - ./static:/app/static  # Source static files
+      - ./staticfiles:/app/staticfiles  # Collected static files
     ports:
       - "8000:8000"
     env_file: .env
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   worker:
     build: .
     command: celery -A mini_netumo worker -l info
     working_dir: /app
     volumes:
-      - ./backend:/app
+      - ./:/app
     env_file: .env
     depends_on:
       - backend
@@ -47,17 +61,17 @@ services:
 
   beat:
     build: .
-    command: celery -A mini_netumo beat -l info
+    command: celery -A mini_netumo beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     working_dir: /app
     volumes:
-      - ./backend:/app
+      - ./:/app
     env_file: .env
     depends_on:
       - backend
-      - redis
+      - db  # Added db dependency for celery beat
 
   vue-frontend:
-    build: .
+    build: ../vue-dashboard
     ports:
       - "3001:80"
     healthcheck:
@@ -65,6 +79,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+    # Removed deploy.replicas as it requires swarm mode
 
   nginx:
     image: nginx:alpine
@@ -74,6 +89,7 @@ services:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - vue-frontend
+      - backend  # Added backend dependency
 
   backup:
     build: ./backup/cron
@@ -85,7 +101,8 @@ services:
       POSTGRES_PASSWORD: admin
       POSTGRES_HOST: db
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
 volumes:
   pgdata:

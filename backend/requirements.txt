@@ -1,2 +1,21 @@
 celery
 redis
+gunicorn
+Django
+django-cors-headers
+djangorestframework-simplejwt
+requests
+# REST Framework
+djangorestframework
+python-whois>=0.8.0
+# Celery
+celery
+django-celery-beat
+django-celery-results
+
+# Database
+psycopg2-binary
+
+# Other likely needed dependencies
+python-dotenv
+

@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_celery_beat',
     'api',
+    'mini_netumo'
 ]
 
 MIDDLEWARE = [
@@ -88,13 +89,22 @@ REST_FRAMEWORK = {
     )
 }
 
+STATICFILES_DIRS = []
+STATIC_ROOT = '/app/staticfiles'
+# or, if you want to be dynamic and safe:
+static_dir = os.path.join(BASE_DIR, 'static')
+if os.path.exists(static_dir):
+    STATICFILES_DIRS = [static_dir]
+else:
+    STATICFILES_DIRS = []
+
 
 # CELERY_BROKER_URL = 'redis://redis:6379/0'  # docker service name redis
 # CELERY_ACCEPT_CONTENT = ['json']
 # CELERY_TASK_SERIALIZER = 'json'
 
 # Celery config
-CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Or RabbitMQ
+CELERY_BROKER_URL = 'redis://redis:6379/0'  # Or RabbitMQ
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'  # Or your timezone
